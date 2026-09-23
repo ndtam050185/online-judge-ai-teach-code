@@ -13,7 +13,7 @@ app.use(express.static('public'));
 // ==========================================
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "YOUR_GEMINI_API_KEY";
 const JUDGE0_API_URL = "https://judge0-extra-ce.p.rapidapi.com"; 
-const SPREADSHEET_ID = process.env.SPREADSHEET_ID || ""; // ID Google Sheet (nếu có)
+const SPREADSHEET_ID = process.env.SPREADSHEET_ID || "1nPvK3IfO6ZkjnfiUmBCd9G9tfWA8_BSoyUlahNQb_qQ"; // ID Google Sheet (nếu có)
 
 // Mã ngôn ngữ lập trình của Judge0
 const LANGUAGE_IDS = {
