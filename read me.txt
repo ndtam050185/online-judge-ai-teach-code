@@ -1,0 +1,57 @@
+my-online-judge/
+├── node_modules/         (Không đưa folder này lên)
+├── public/
+│   └── index.html        (File giao diện frontend)
+├── .env                  (File chứa API Key - Không đưa lên GitHub)
+├── .gitignore            (File khai báo các file bỏ qua)
+├── package.json          (File khai báo thư viện)
+└── server.js             (File backend chính)
+
+📌 BƯỚC 2: Đẩy dự án lên GitHub
+Render lấy mã nguồn trực tiếp từ GitHub, nên bạn cần đẩy dự án lên một kho chứa (Repository) trên GitHub trước:
+
+1. Đăng nhập vào GitHub.com (Tạo tài khoản nếu chưa có).
+
+2. Tải và cài đặt Git trên máy tính nếu chưa cài.
+
+3. Tạo một Repository mới trên GitHub:
+
+Nhấn nút New (hoặc dấu + ở góc trên bên phải).
+
+Đặt tên kho chứa (VD: online-judge-ai).
+
+Chọn trạng thái Private (Riêng tư) hoặc Public.
+
+Nhấn Create repository.
+
+4. Mở Terminal (hoặc Command Prompt / Git Bash) tại thư mục dự án trên máy tính và chạy lần lượt các lệnh sau:
+git init
+git add .
+git commit -m "Khoi tao du an Online Judge"
+git branch -M main
+git remote add origin https://github.com/Tên_Tài_Khoản_GitHub/online-judge-ai.git
+git push -u origin main
+
+📌 BƯỚC 3: Triển khai web lên Render.comTruy cập trang web Render.com và tạo tài khoản 
+(nên dùng nút Sign in with GitHub để liên kết trực tiếp).Sau khi đăng nhập, tại Bảng điều khiển (Dashboard), 
+nhấn nút New + ở góc phải và chọn Web Service.Chọn tùy chọn Build and deploy from a Git repository $\rightarrow$ 
+Nhấn Next.Tìm đến tên Repository online-judge-ai của bạn vừa đẩy lên GitHub và nhấn Connect.Cấu hình các thông số 
+trên trang cài đặt Render:Name: Đặt tên cho Web (VD: my-online-judge — Tên này sẽ làm tên miền web của bạn).
+Language: Chọn Node.Branch: Chọn main.Region: Chọn Singapore (để tốc độ về Việt Nam nhanh nhất).Build Command: 
+Điền npm install.Start Command: Điền npm start (hoặc node server.js).Instance Type: Chọn gói Free ($0/month).
+
+📌 BƯỚC 4: Khai báo biến môi trường (API Keys)Để bảo mật, bạn khai báo API Key trực tiếp trên giao diện Render 
+thay vì dán vào mã nguồn:Cuộn xuống phần Environment Variables (hoặc nhấn tab Environment ở cột bên trái).
+Nhấn nút Add Environment Variable:Key: GEMINI_API_KEYValue: Dán mã API Key lấy từ Google AI Studio vào đây.
+Nhấn Create Web Service (hoặc Save Changes).📌 BƯỚC 5: Hoàn tất và Sử dụngRender sẽ tự động tải mã nguồn, 
+chạy lệnh npm install và mở dịch vụ.Quá trình triển khai kéo dài khoảng 1–3 phút. Khi thấy dòng chữ trạng 
+thái màu xanh Live, phía trên góc trái giao diện sẽ hiển thị đường link trang web của bạn (có dạng 
+[https://my-online-judge.onrender.com](https://my-online-judge.onrender.com)).Giờ đây, bạn có thể gửi đường 
+link này cho học sinh truy cập để đăng nhập và làm bài!💡 Lưu ý quan trọng khi dùng gói Free trên Render:
+Chế độ ngủ (Sleep mode): Ở gói Free, nếu trong 15 phút không có ai truy cập, Render sẽ tự động tạm ngưng server 
+để tiết kiệm tài nguyên.Khi có người truy cập lại, trang web sẽ mất khoảng 30 - 50 giây ở lần tải đầu tiên để khởi động lại. 
+Từ lần click tiếp theo, hệ thống sẽ chạy cực kỳ nhanh và mượt mà.
+
+
+
+

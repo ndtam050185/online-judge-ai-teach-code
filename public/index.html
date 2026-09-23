@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Học & Chấm Lập Trình Online</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Marked JS (Hiển thị Markdown gợi ý từ AI) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Monaco Editor Loader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans">
+
+    <!-- ========================================== -->
+    <!-- 1. MÀN HÌNH ĐĂNG NHẬP                      -->
+    <!-- ========================================== -->
+    <div id="loginScreen" class="flex items-center justify-center min-h-screen">
+        <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-md border border-gray-200">
+            <h2 class="text-2xl font-bold text-center text-indigo-600 mb-6">Đăng Nhập Học Sinh</h2>
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tên đăng nhập</label>
+                    <input type="text" id="loginUsername" required placeholder="Nhập tên đăng nhập do thầy cấp" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
+                    <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div id="loginError" class="text-red-500 text-sm hidden"></div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition">
+                    Đăng nhập
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- KHU VỰC SAU KHI ĐĂNG NHẬP (NAVBAR CHUNG)    -->
+    <!-- ========================================== -->
+    <div id="appScreen" class="hidden min-h-screen flex flex-col">
+        
+        <!-- Header / Navigation Bar -->
+        <header class="bg-indigo-600 text-white px-6 py-3 shadow flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <h1 class="text-xl font-bold flex items-center gap-2 cursor-pointer" onclick="showDashboard()">
+                    💻 Online Judge AI
+                </h1>
+                <span id="userInfo" class="bg-indigo-700 px-3 py-1 rounded-full text-xs text-indigo-100"></span>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="btnBackToDashboard" onclick="showDashboard()" class="hidden bg-indigo-500 hover:bg-indigo-700 text-xs px-3 py-1.5 rounded">
+                    ← Danh sách bài tập
+                </button>
+                <button onclick="handleLogout()" class="bg-red-500 hover:bg-red-600 text-xs px-3 py-1.5 rounded transition">
+                    Đăng xuất
+                </button>
+            </div>
+        </header>
+
+        <!-- ========================================== -->
+        <!-- 2. MÀN HÌNH DANH SÁCH BÀI TẬP (DASHBOARD)  -->
+        <!-- ========================================== -->
+        <main id="dashboardView" class="p-6 max-w-6xl mx-auto w-full flex-1">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Lộ trình rèn luyện Lập trình</h2>
+                <p class="text-gray-600 text-sm">Hoàn thành bài tập để mở khóa các thử thách ở cấp độ cao hơn!</p>
+            </div>
+
+            <!-- Cấp độ 1: Cơ bản -->
+            <section class="mb-8">
+                <h3 class="text-lg font-bold text-green-700 mb-3 flex items-center gap-2">
+                    🟢 Bài tập Cơ bản <span class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full font-normal">Đã mở khóa</span>
+                </h3>
+                <div id="easyProblemList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </section>
+
+            <!-- Cấp độ 2: Nâng cao -->
+            <section class="mb-8">
+                <h3 class="text-lg font-bold text-yellow-700 mb-3 flex items-center gap-2">
+                    🟡 Bài tập Nâng cao 
+                    <span id="badgeMedium" class="text-xs px-2 py-0.5 rounded-full font-normal bg-gray-200 text-gray-600">Đang khóa</span>
+                </h3>
+                <div id="mediumProblemList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </section>
+
+            <!-- Cấp độ 3: Bài tập Khó -->
+            <section class="mb-8">
+                <h3 class="text-lg font-bold text-red-700 mb-3 flex items-center gap-2">
+                    🔴 Bài tập Khó
+                    <span id="badgeHard" class="text-xs px-2 py-0.5 rounded-full font-normal bg-gray-200 text-gray-600">Đang khóa</span>
+                </h3>
+                <div id="hardProblemList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </section>
+        </main>
+
+        <!-- ========================================== -->
+        <!-- 3. MÀN HÌNH LÀM BÀI LẬP TRÌNH (PRACTICE)   -->
+        <!-- ========================================== -->
+        <main id="practiceView" class="hidden flex-1 flex overflow-hidden p-4 gap-4">
+            
+            <!-- Cột Trái: Đề bài & Phản hồi AI -->
+            <div class="w-1/2 flex flex-col gap-4">
+                <!-- Đề bài -->
+                <div class="bg-white p-4 rounded-lg shadow border flex-1 overflow-y-auto">
+                    <div class="flex justify-between items-center border-b pb-2 mb-3">
+                        <h2 id="currentProblemTitle" class="text-lg font-bold text-gray-800">Tên bài tập</h2>
+                        <span id="currentProblemLevel" class="text-xs px-2 py-1 rounded font-semibold"></span>
+                    </div>
+                    <div id="currentProblemDesc" class="text-gray-700 text-sm space-y-2"></div>
+                </div>
+
+                <!-- Cửa sổ Chấm bài & AI gợi ý -->
+                <div class="bg-white p-4 rounded-lg shadow border h-1/2 flex flex-col overflow-hidden">
+                    <div class="font-bold text-gray-800 border-b pb-2 flex justify-between items-center">
+                        <span>Kết quả & Gợi ý AI</span>
+                        <span id="statusBadge" class="hidden text-xs px-2 py-1 rounded"></span>
+                    </div>
+                    <div id="resultContent" class="flex-1 overflow-y-auto mt-3 text-sm text-gray-600">
+                        <p class="italic text-gray-400">Viết code và bấm "Nộp bài" để nhận phản hồi từ thầy AI...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cột Phải: Monaco Code Editor -->
+            <div class="w-1/2 bg-white rounded-lg shadow border flex flex-col overflow-hidden">
+                <div class="bg-gray-100 px-4 py-2 border-b flex justify-between items-center">
+                    <select id="languageSelect" class="bg-white border text-xs px-2 py-1 rounded">
+                        <option value="python">Python 3</option>
+                        <option value="cpp">C++</option>
+                        <option value="java">Java</option>
+                    </select>
+                    <button onclick="submitCode()" id="btnSubmit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded font-medium text-xs transition">
+                        ▶ Nộp bài
+                    </button>
+                </div>
+                <div id="editor" class="flex-1"></div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SCRIPT XỬ LÝ INTERACTION FRONTEND         -->
+    <!-- ========================================== -->
+    <script>
+        let currentUser = null;
+        let currentProblem = null;
+        let editor = null;
+
+        // Khởi tạo Monaco Editor
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs' }});
+        require(['vs/editor/editor.main'], function() {
+            editor = monaco.editor.create(document.getElementById('editor'), {
+                value: `# Viết mã nguồn của bạn ở đây\n`,
+                language: 'python',
+                theme: 'vs-dark',
+                automaticLayout: true,
+                fontSize: 14
+            });
+        });
+
+        // 1. Xử lý Đăng nhập
+        async function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    currentUser = data.user;
+                    document.getElementById('userInfo').innerText = `${currentUser.name} (${currentUser.role})`;
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('appScreen').classList.remove('hidden');
+                    showDashboard();
+                } else {
+                    errorDiv.innerText = data.message;
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorDiv.innerText = "Lỗi kết nối máy chủ!";
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        // 2. Đăng xuất
+        function handleLogout() {
+            currentUser = null;
+            document.getElementById('appScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        // 3. Tải và hiển thị Danh sách bài tập
+        async function showDashboard() {
+            document.getElementById('dashboardView').classList.remove('hidden');
+            document.getElementById('practiceView').classList.add('hidden');
+            document.getElementById('btnBackToDashboard').classList.add('hidden');
+
+            const res = await fetch(`/api/problems/${currentUser.id}`);
+            const data = await res.json();
+
+            // Render các danh sách bài tập
+            renderProblemCards('easyProblemList', data.availableProblems.easy, data.completedProblemIds, true);
+            renderProblemCards('mediumProblemList', data.availableProblems.medium, data.completedProblemIds, data.unlockedLevels.medium);
+            renderProblemCards('hardProblemList', data.availableProblems.hard, data.completedProblemIds, data.unlockedLevels.hard);
+
+            // Cập nhật trạng thái Badge
+            updateBadge('badgeMedium', data.unlockedLevels.medium);
+            updateBadge('badgeHard', data.unlockedLevels.hard);
+        }
+
+        function updateBadge(badgeId, isUnlocked) {
+            const el = document.getElementById(badgeId);
+            if (isUnlocked) {
+                el.innerText = "Đã mở khóa";
+                el.className = "text-xs px-2 py-0.5 rounded-full font-normal bg-green-100 text-green-800";
+            } else {
+                el.innerText = "🔒 Đang khóa (Cần hoàn thành cấp trước)";
+                el.className = "text-xs px-2 py-0.5 rounded-full font-normal bg-gray-200 text-gray-600";
+            }
+        }
+
+        function renderProblemCards(containerId, problems, completedIds, isUnlocked) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            if (!isUnlocked) {
+                container.innerHTML = `<div class="col-span-full text-sm text-gray-400 italic bg-white p-4 rounded border">Bạn cần hoàn thành các bài tập ở cấp độ trước để mở khóa khu vực này.</div>`;
+                return;
+            }
+
+            if (problems.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-sm text-gray-400 italic">Chưa có bài tập trong mục này.</div>`;
+                return;
+            }
+
+            problems.forEach(p => {
+                const isDone = completedIds.includes(p.id);
+                const card = document.createElement('div');
+                card.className = `bg-white p-4 rounded-lg shadow border flex justify-between items-center ${isDone ? 'border-green-400 bg-green-50/30' : ''}`;
+                card.innerHTML = `
+                    <div>
+                        <h4 class="font-bold text-gray-800">${p.title} ${isDone ? '✅' : ''}</h4>
+                        <span class="text-xs text-gray-500">${p.category}</span>
+                    </div>
+                    <button onclick="openProblem('${p.id}')" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded">
+                        ${isDone ? 'Làm lại' : 'Làm bài'}
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 4. Mở bài tập để làm
+        async function openProblem(problemId) {
+            const res = await fetch(`/api/problems/${currentUser.id}`);
+            const data = await res.json();
+            
+            // Tìm bài tập trong tất cả các danh sách
+            const allProblems = [...data.availableProblems.easy, ...data.availableProblems.medium, ...data.availableProblems.hard];
+            currentProblem = allProblems.find(p => p.id === problemId);
+
+            if (!currentProblem) return;
+
+            document.getElementById('dashboardView').classList.add('hidden');
+            document.getElementById('practiceView').classList.remove('hidden');
+            document.getElementById('btnBackToDashboard').classList.remove('hidden');
+
+            // Điền thông tin bài tập
+            document.getElementById('currentProblemTitle').innerText = currentProblem.title;
+            document.getElementById('currentProblemDesc').innerHTML = `
+                <p>${currentProblem.description}</p>
+                <div class="bg-gray-50 p-2 rounded border mt-3 text-xs font-mono">
+                    <strong>Ví dụ mẫu:</strong><br>
+                    Input: ${currentProblem.testcases[0].input.replace('\n', ' ')}<br>
+                    Output: ${currentProblem.testcases[0].expectedOutput}
+                </div>
+            `;
+
+            document.getElementById('resultContent').innerHTML = `<p class="italic text-gray-400">Nhấn "Nộp bài" để chạy kiểm tra.</p>`;
+            document.getElementById('statusBadge').classList.add('hidden');
+        }
+
+        // 5. Nộp bài
+        async function submitCode() {
+            const code = editor.getValue();
+            const language = document.getElementById('languageSelect').value;
+            const btnSubmit = document.getElementById('btnSubmit');
+            const resultContent = document.getElementById('resultContent');
+            const statusBadge = document.getElementById('statusBadge');
+
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = "⏳ Đang chấm...";
+            resultContent.innerHTML = `<p class="text-indigo-600 font-medium">Hệ thống đang kiểm tra testcases...</p>`;
+
+            try {
+                const res = await fetch('/api/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: currentUser.id,
+                        problemId: currentProblem.id,
+                        code,
+                        language,
+                        problemStatement: currentProblem.description,
+                        testcases: currentProblem.testcases
+                    })
+                });
+
+                const data = await res.json();
+
+                if (data.status === 'SUCCESS') {
+                    statusBadge.textContent = "Chính xác";
+                    statusBadge.className = "text-xs px-2 py-1 rounded bg-green-100 text-green-800 font-bold border border-green-300";
+                    statusBadge.classList.remove('hidden');
+
+                    resultContent.innerHTML = `
+                        <div class="p-3 bg-green-50 rounded border border-green-200 text-green-800 space-y-2">
+                            <p>🎉 <strong>Chúc mừng!</strong> ${data.message}</p>
+                            <p class="text-xs text-green-700">${data.nextRecommendation || ''}</p>
+                        </div>`;
+                } else {
+                    statusBadge.textContent = "Chưa chính xác";
+                    statusBadge.className = "text-xs px-2 py-1 rounded bg-red-100 text-red-800 font-bold border border-red-300";
+                    statusBadge.classList.remove('hidden');
+
+                    const formattedMarkdown = marked.parse(data.aiFeedback);
+                    resultContent.innerHTML = `
+                        <div class="prose prose-sm max-w-none text-gray-800">
+                            ${formattedMarkdown}
+                        </div>`;
+                }
+
+            } catch (err) {
+                resultContent.innerHTML = `<div class="text-red-500">Lỗi gửi bài nộp!</div>`;
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "▶ Nộp bài";
+            }
+        }
+    </script>
+</body>
+</html>
